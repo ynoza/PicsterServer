@@ -42,16 +42,18 @@ const storage = multer.diskStorage({
 //   app.use('/images', express.static('images'));   
 
 
-
-//   app.get('/getUploads', (req, res) => console.log("hi"));
   
-  app.get('/getUploads', function(req, res){;
+  app.post('/getUploads', function(req, res){;
     // res.sendFile(path.resolve(path.resolve(__dirname,'./public')));
     let lst=[];
+    const username = req.body.username;
+    console.log(username);
     const folder = './public/uploads/';
     fs.readdir(folder, (err, files) => {
-        files.forEach(file => {
+        files.forEach(file => {  
+          if (file.startsWith(username+"-")){
             lst.push('http://localhost:4000/public/uploads/'+file);
+          }
         });
         res.send(lst);
       });
@@ -59,14 +61,14 @@ const storage = multer.diskStorage({
 
 var type = upload.single('myImage');
 
-app.post('/upload', type, (req, res, next) => {
-    const file = req.file
+  app.post('/upload', type, (req, res, next) => {
+    const file = req.file;
     if (!file) {
       const error = new Error('Please upload a file')
       error.httpStatusCode = 400
       return next(error)
     }
-      res.send(file)
+    res.send(file)
   })
 
 app.post('/delete', (req, res, next) => {
@@ -79,12 +81,8 @@ app.post('/delete', (req, res, next) => {
             break;   
         }
     }
-    // console.log(str);
 
-    // const file = req.file
-    // console.log(file);
     const pathToFile = './public/uploads/' + str;
-    // const pathToFile = './public/uploads/cat_2.0.png';
     fs.unlink(pathToFile, (err) => {
         console.log(err);
     })
