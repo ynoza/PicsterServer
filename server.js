@@ -50,7 +50,11 @@ const storage = multer.diskStorage({
     fs.readdir(folder, (err, files) => {
         files.forEach(file => {  
           if (file.startsWith(username+"-")){
-            lst.push('http://localhost:4000/public/uploads/'+file);
+            var url = encodeURI('http://localhost:4000/public/uploads/'+file);
+            // console.log(url);
+            lst.push(url);
+
+            // lst.push('http://localhost:4000/public/uploads/'+file);
           }
         });
         res.send(lst);
@@ -85,7 +89,7 @@ app.post('/delete', (req, res, next) => {
     // part that connects to local storage and removes the file
     const pathToFile = './public/uploads/' + str;
     fs.unlink(pathToFile, (err) => {
-        console.log(err);
+        if (err) console.log(err);
     })
 })
 
