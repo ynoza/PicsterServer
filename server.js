@@ -18,11 +18,11 @@ app.use('/users', require('./users/users.controller'));
 
 // global error handler
 app.use(errorHandler);
+
 // Set The Storage Engine
 const storage = multer.diskStorage({
     destination: './public/uploads/',
     filename: function(req, file, cb){
-        // console.log(file);
         cb(null,file.originalname);
     //   cb(null,file.originalname +'-' +  Date.now() + path.extname(file.originalname));
     }
@@ -33,21 +33,19 @@ const storage = multer.diskStorage({
     storage: storage,
     limits:{fileSize: 1000000},
   });
-  
-  
-  const serveIndex = require('serve-index');
+    
+  // const serveIndex = require('serve-index');
   app.use('/public', express.static('./public'));
-//   app.use(express.static(__dirname + 'public/uploads'));
-//   app.use('/ftp', express.static('public'), serveIndex('public', {'icons': true}));
-//   app.use('/images', express.static('images'));   
+//   app.use('/ftp', express.static('public'), serveIndex('public', {'icons': true})); 
 
-
-  
+  // Get all the Images uploaded according to the user
   app.post('/getUploads', function(req, res){;
+    // method to send a single file,: ineffcient for multiple images though
     // res.sendFile(path.resolve(path.resolve(__dirname,'./public')));
+
+    // lst of filenames of images according to the user
     let lst=[];
     const username = req.body.username;
-    console.log(username);
     const folder = './public/uploads/';
     fs.readdir(folder, (err, files) => {
         files.forEach(file => {  
@@ -59,9 +57,11 @@ const storage = multer.diskStorage({
       });
   });
 
+// tag of images being sent are myImage
 var type = upload.single('myImage');
 
-  app.post('/upload', type, (req, res, next) => {
+// handles the addition of new images
+app.post('/upload', type, (req, res, next) => {
     const file = req.file;
     if (!file) {
       const error = new Error('Please upload a file')
@@ -71,17 +71,18 @@ var type = upload.single('myImage');
     res.send(file)
   })
 
+// handles the deletion of images
 app.post('/delete', (req, res, next) => {
-    console.log(req.body.fileName);
+
     let str = req.body.fileName;     
-    for (var i = str.length - 1; i >= 0; i--){  
-        // console.log(str[i], '/');       
+    for (var i = str.length - 1; i >= 0; i--){    
         if (str[i]===('/')) {
             str=str.slice(i+1,str.length)
             break;   
         }
     }
 
+    // part that connects to local storage and removes the file
     const pathToFile = './public/uploads/' + str;
     fs.unlink(pathToFile, (err) => {
         console.log(err);
