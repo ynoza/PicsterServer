@@ -45,18 +45,17 @@ const storage = multer.diskStorage({
 
 //   app.get('/getUploads', (req, res) => console.log("hi"));
   
-//   app.get('/getUploads', function(req, res){;
-//     // res.sendFile(path.resolve(path.resolve(__dirname,'./public')));
-//     let lst=[];
-//     const folder = './public/uploads/';
-//     fs.readdir(folder, (err, files) => {
-//         files.forEach(file => {
-//             console.log(file);
-//         //   lst.append(file.);
-//         });
-//       });
-//     res.send(lst);
-//   });
+  app.get('/getUploads', function(req, res){;
+    // res.sendFile(path.resolve(path.resolve(__dirname,'./public')));
+    let lst=[];
+    const folder = './public/uploads/';
+    fs.readdir(folder, (err, files) => {
+        files.forEach(file => {
+            lst.push('http://localhost:4000/public/uploads/'+file);
+        });
+        res.send(lst);
+      });
+  });
 
 var type = upload.single('myImage');
 
