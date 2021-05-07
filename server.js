@@ -7,6 +7,7 @@ const errorHandler = require('_middleware/error-handler');
 const multer = require('multer');
 const path = require('path');
 const ejs = require('ejs');
+const fs = require('fs');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -21,7 +22,9 @@ app.use(errorHandler);
 const storage = multer.diskStorage({
     destination: './public/uploads/',
     filename: function(req, file, cb){
-      cb(null,file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+        // console.log(file);
+        cb(null,file.originalname);
+    //   cb(null,file.originalname +'-' +  Date.now() + path.extname(file.originalname));
     }
   });
   
@@ -32,14 +35,28 @@ const storage = multer.diskStorage({
   });
   
   
-  // EJS
-  app.set('view engine', 'html');
+  const serveIndex = require('serve-index');
+  app.use('/public', express.static('./public'));
+//   app.use(express.static(__dirname + 'public/uploads'));
+//   app.use('/ftp', express.static('public'), serveIndex('public', {'icons': true}));
+//   app.use('/images', express.static('images'));   
+
+
+
+//   app.get('/getUploads', (req, res) => console.log("hi"));
   
-  // Public Folder
-  app.use(express.static('./public'));
-  
-//   app.get('/', (req, res) => console.log("hi"));
-  
+//   app.get('/getUploads', function(req, res){;
+//     // res.sendFile(path.resolve(path.resolve(__dirname,'./public')));
+//     let lst=[];
+//     const folder = './public/uploads/';
+//     fs.readdir(folder, (err, files) => {
+//         files.forEach(file => {
+//             console.log(file);
+//         //   lst.append(file.);
+//         });
+//       });
+//     res.send(lst);
+//   });
 
 var type = upload.single('myImage');
 
@@ -51,8 +68,28 @@ app.post('/upload', type, (req, res, next) => {
       return next(error)
     }
       res.send(file)
-    
   })
+
+app.post('/delete', (req, res, next) => {
+    console.log(req.body.fileName);
+    let str = req.body.fileName;     
+    for (var i = str.length - 1; i >= 0; i--){  
+        // console.log(str[i], '/');       
+        if (str[i]===('/')) {
+            str=str.slice(i+1,str.length)
+            break;   
+        }
+    }
+    // console.log(str);
+
+    // const file = req.file
+    // console.log(file);
+    const pathToFile = './public/uploads/' + str;
+    // const pathToFile = './public/uploads/cat_2.0.png';
+    fs.unlink(pathToFile, (err) => {
+        console.log(err);
+    })
+})
 
 // start server
 const port = process.env.NODE_ENV === 'production' ? (process.env.PORT || 80) : 4000;
