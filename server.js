@@ -8,6 +8,11 @@ const multer = require('multer');
 const path = require('path');
 const ejs = require('ejs');
 const fs = require('fs');
+const tf = require('@tensorflow/tfjs');
+const mobilenet = require('@tensorflow-models/mobilenet');
+const tfnode = require('@tensorflow/tfjs-node');
+
+let classficationToImagesMap = new Map()
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -67,6 +72,7 @@ var type = upload.single('myImage');
 // handles the addition of new images
 app.post('/upload', type, (req, res, next) => {
     const file = req.file;
+    intermediateClassificationDataToMap(file.originalname);
     if (!file) {
       const error = new Error('Please upload a file')
       error.httpStatusCode = 400
@@ -85,13 +91,87 @@ app.post('/delete', (req, res, next) => {
             break;   
         }
     }
-
+    removeClassificationDataToMap(file);
     // part that connects to local storage and removes the file
     const pathToFile = './public/uploads/' + str;
     fs.unlink(pathToFile, (err) => {
         if (err) console.log(err);
     })
 })
+
+
+
+// Reading an Image for Image Classification
+const readImage = path => {
+
+  const imageBuffer = fs.readFileSync(path);
+
+  const tfimage = tfnode.node.decodeImage(imageBuffer);
+  return tfimage;
+}
+
+// Actually doing the classfication for Image Classification
+const imageClassification = async path => {
+  const image = readImage(path);
+  // Load the model.
+  const mobilenetModel = await mobilenet.load();
+  // Classify the image.
+  const predictions = await mobilenetModel.classify(image);
+  // console.log('Classification Results:', predictions);
+  return getClassNames(predictions);
+}
+
+const getClassNames =  (predictions) => {
+  // console.log(predictions);
+  let newPredictions=[];
+  predictions.forEach( (pair) => {
+    pair['className'].split(',').forEach( (potentialDesc) => {
+        if (potentialDesc.length > 0){
+          newPredictions.push(potentialDesc);
+        }
+    })
+  })
+  console.log(newPredictions);
+  return newPredictions;
+}
+
+
+function initialAddClassificationDataToMap(){
+  const folder = './public/uploads/';
+  fs.readdir(folder, (err, files) => {
+    files.forEach(file => {
+      intermediateClassificationDataToMap(file);
+      })
+    })
+  }
+
+  function intermediateClassificationDataToMap(file) {
+      if (file.endsWith('.jfif')){
+        // console.log('hiiiiiiiii');
+        const newPredictions = 'Cannot Classify .jfif file';
+        classficationToImagesMap.set('file', newPredictions);
+      }
+      else {
+        const newPredictions = imageClassification('./public/uploads/' + file);    
+        newPredictions.then( () => {
+          classficationToImagesMap.set(file, newPredictions);   
+          console.log(classficationToImagesMap);  
+        })
+      }
+      // when you do a log here it doesnt wait for the result of newPredictions so it will redturn a pending Promise
+      // console.log(newPredictions);
+    }
+
+    function removeClassificationDataToMap(file){
+      if (classficationToImagesMap.has(file)){
+        classficationToImagesMap.delete(file);
+      }
+      console.log(classficationToImagesMap);
+    }
+
+// imageClassification('./public/uploads/admin-dolphin.png');
+// initialAddClassificationDataToMap();
+// removeClassificationDataToMap('./public/uploads/admin-cat.png')
 
 // start server
 const port = process.env.NODE_ENV === 'production' ? (process.env.PORT || 80) : 4000;
