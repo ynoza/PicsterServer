@@ -69,9 +69,9 @@ const storage = multer.diskStorage({
 var type = upload.single('myImage');
 
 // handles the addition of new images
-app.post('/upload', type, (req, res, next) => {
+app.post('/upload', type, async (req, res, next) => {
     const file = req.file;
-    intermediateClassificationDataToMap(file.originalname);
+    var useless = await intermediateClassificationDataToMap(file.originalname);
     if (!file) {
       const error = new Error('Please upload a file')
       error.httpStatusCode = 400
@@ -147,25 +147,30 @@ const getClassNames =  (predictions) => {
 }
 
 
-function initialAddClassificationDataToMap(){
-  const folder = './public/uploads/';
-  fs.readdir(folder, (err, files) => {
-    files.forEach(file => {
-      intermediateClassificationDataToMap(file);
+async function initialAddClassificationDataToMap(){
+  return new Promise(function (resolve, reject) {
+    const folder = './public/uploads/';
+    fs.readdir(folder, (err, files) => {
+      files.forEach(async file => {
+        var useless = await intermediateClassificationDataToMap(file);
+      })
+      resolve(folder);
     })
   })
 }
 
-  function intermediateClassificationDataToMap(file) {
+async function intermediateClassificationDataToMap(file) {
+  return new Promise(function (resolve, reject) {
     const newPredictions = imageClassification('./public/uploads/' + file);    
     newPredictions.then( () => {
       classficationToImagesMap.set(file, newPredictions);   
       console.log(classficationToImagesMap);  
-      return Promise;
+      resolve(file);
     })
     // when you do a log here it doesnt wait for the result of newPredictions so it will redturn a pending Promise
     // console.log(newPredictions);
-  }
+  })
+}
 
   function removeClassificationDataToMap(file){
     if (classficationToImagesMap.has(file)){
@@ -175,9 +180,13 @@ function initialAddClassificationDataToMap(){
   }
 
 // imageClassification('./public/uploads/admin-dolphin.png');
-initialAddClassificationDataToMap();
 // removeClassificationDataToMap('./public/uploads/admin-cat.png')
 
 // start server
 const port = process.env.NODE_ENV === 'production' ? (process.env.PORT || 80) : 4000;
-app.listen(port, () => console.log('Server listening on port ' + port));
+const useless = initialAddClassificationDataToMap();
+useless.then( () => {
+  app.listen(port, async () => {
+    console.log('Server listening on port ' + port)
+  })
+});
