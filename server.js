@@ -35,8 +35,7 @@ const storage = multer.diskStorage({
   
   // Init Upload
   const upload = multer({
-    storage: storage,
-    limits:{fileSize: 1000000},
+    storage: storage
   });
     
   // const serveIndex = require('serve-index');
@@ -91,7 +90,12 @@ app.post('/delete', (req, res, next) => {
             break;   
         }
     }
-    removeClassificationDataToMap(file);
+    try {
+      removeClassificationDataToMap(str);
+    }
+    catch {
+      console.log("unable to remove Image from Map")
+    }
     // part that connects to local storage and removes the file
     const pathToFile = './public/uploads/' + str;
     fs.unlink(pathToFile, (err) => {
@@ -116,9 +120,16 @@ const imageClassification = async path => {
   // Load the model.
   const mobilenetModel = await mobilenet.load();
   // Classify the image.
-  const predictions = await mobilenetModel.classify(image);
+  let newPredictions=[];
+  try {
+    const predictions = await mobilenetModel.classify(image);
+    newPredictions = getClassNames(predictions);
+  }
+  catch {
+    newPredictions = 'Cannot Classify this image, most likely because of its size or its format';
+  }
   // console.log('Classification Results:', predictions);
-  return getClassNames(predictions);
+  return newPredictions;
 }
 
 const getClassNames =  (predictions) => {
@@ -131,7 +142,7 @@ const getClassNames =  (predictions) => {
         }
     })
   })
-  console.log(newPredictions);
+  // console.log(newPredictions);
   return newPredictions;
 }
 
@@ -141,36 +152,30 @@ function initialAddClassificationDataToMap(){
   fs.readdir(folder, (err, files) => {
     files.forEach(file => {
       intermediateClassificationDataToMap(file);
-      })
     })
-  }
+  })
+}
 
   function intermediateClassificationDataToMap(file) {
-      if (file.endsWith('.jfif')){
-        // console.log('hiiiiiiiii');
-        const newPredictions = 'Cannot Classify .jfif file';
-        classficationToImagesMap.set('file', newPredictions);
-      }
-      else {
-        const newPredictions = imageClassification('./public/uploads/' + file);    
-        newPredictions.then( () => {
-          classficationToImagesMap.set(file, newPredictions);   
-          console.log(classficationToImagesMap);  
-        })
-      }
-      // when you do a log here it doesnt wait for the result of newPredictions so it will redturn a pending Promise
-      // console.log(newPredictions);
-    }
+    const newPredictions = imageClassification('./public/uploads/' + file);    
+    newPredictions.then( () => {
+      classficationToImagesMap.set(file, newPredictions);   
+      console.log(classficationToImagesMap);  
+      return Promise;
+    })
+    // when you do a log here it doesnt wait for the result of newPredictions so it will redturn a pending Promise
+    // console.log(newPredictions);
+  }
 
-    function removeClassificationDataToMap(file){
-      if (classficationToImagesMap.has(file)){
-        classficationToImagesMap.delete(file);
-      }
-      console.log(classficationToImagesMap);
+  function removeClassificationDataToMap(file){
+    if (classficationToImagesMap.has(file)){
+      classficationToImagesMap.delete(file);
     }
+    console.log(classficationToImagesMap);
+  }
 
 // imageClassification('./public/uploads/admin-dolphin.png');
-// initialAddClassificationDataToMap();
+initialAddClassificationDataToMap();
 // removeClassificationDataToMap('./public/uploads/admin-cat.png')
 
 // start server
