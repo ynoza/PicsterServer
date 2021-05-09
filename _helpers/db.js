@@ -2,7 +2,13 @@ const config = require('config.json');
 const mysql = require('mysql2/promise');
 const { Sequelize } = require('sequelize');
 
-module.exports = db = {};
+// module.exports = db = {};
+module.exports = {
+    HOST: "heroku_931ecfbffb230c4",
+    USER: "b1f6bd6150b66f",
+    PASSWORD: "55daa557",
+    DB: "heroku_931ecfbffb230c4"
+  };
 
 initialize();
 
