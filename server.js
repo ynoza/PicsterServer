@@ -12,6 +12,9 @@ const tf = require('@tensorflow/tfjs');
 const mobilenet = require('@tensorflow-models/mobilenet');
 const tfnode = require('@tensorflow/tfjs-node');
 
+let localServerLink='http://localhost:4000/public/uploads/';
+let herokuServerLink='https://picsterserver.herokuapp.com/public/uploads/';
+
 let classficationToImagesMap = new Map()
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -54,7 +57,7 @@ app.post('/getUploads', function(req, res){
     fs.readdir(folder, (err, files) => {
         files.forEach(file => {  
           if (file.startsWith(username+"-")){
-            var url = encodeURI('http://localhost:4000/public/uploads/'+file);
+            var url = encodeURI(herokuServerLink+file);
             lst.push(url);
           }
         });
@@ -106,7 +109,7 @@ app.get('/imagesAndMapPair', function(req, res){
     fs.readdir(folder, (err, files) => {
       files.forEach(file => {  
           if (classficationToImagesMap.has(file)){
-            var url = encodeURI('http://localhost:4000/public/uploads/'+file);
+            var url = encodeURI(herokuServerLink+file);
             let imageDesc = classficationToImagesMap.get(file);
             // console.log(imageDesc)
             const obj = { imageURL: url, desc: imageDesc}
