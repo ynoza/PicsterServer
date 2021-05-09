@@ -43,7 +43,7 @@ const storage = multer.diskStorage({
 //   app.use('/ftp', express.static('public'), serveIndex('public', {'icons': true})); 
 
   // Get all the Images uploaded according to the user
-  app.post('/getUploads', function(req, res){;
+app.post('/getUploads', function(req, res){
     // method to send a single file,: ineffcient for multiple images though
     // res.sendFile(path.resolve(path.resolve(__dirname,'./public')));
 
@@ -55,10 +55,7 @@ const storage = multer.diskStorage({
         files.forEach(file => {  
           if (file.startsWith(username+"-")){
             var url = encodeURI('http://localhost:4000/public/uploads/'+file);
-            // console.log(url);
             lst.push(url);
-
-            // lst.push('http://localhost:4000/public/uploads/'+file);
           }
         });
         res.send(lst);
@@ -71,7 +68,7 @@ var type = upload.single('myImage');
 // handles the addition of new images
 app.post('/upload', type, async (req, res, next) => {
     const file = req.file;
-    var useless = await intermediateClassificationDataToMap(file.originalname);
+    intermediateClassificationDataToMap(file.originalname);
     if (!file) {
       const error = new Error('Please upload a file')
       error.httpStatusCode = 400
@@ -103,6 +100,23 @@ app.post('/delete', (req, res, next) => {
     })
 })
 
+app.get('/imagesAndMapPair', function(req, res){
+  lst=[];
+  const folder = './public/uploads/';
+    fs.readdir(folder, (err, files) => {
+      files.forEach(file => {  
+          if (classficationToImagesMap.has(file)){
+            var url = encodeURI('http://localhost:4000/public/uploads/'+file);
+            let imageDesc = classficationToImagesMap.get(file);
+            // console.log(imageDesc)
+            const obj = { imageURL: url, desc: imageDesc}
+            lst.push(obj);
+          }
+      });
+      res.send(lst);
+    });
+})
+
 
 
 // Reading an Image for Image Classification
@@ -125,8 +139,9 @@ const imageClassification = async path => {
     const predictions = await mobilenetModel.classify(image);
     newPredictions = getClassNames(predictions);
   }
-  catch {
-    newPredictions = 'Cannot Classify this image, most likely because of its size or its format';
+  catch(err) {
+    console.log(err);
+    newPredictions = 'Cannot classify this image because of its size or its format';
   }
   // console.log('Classification Results:', predictions);
   return newPredictions;
@@ -162,9 +177,9 @@ async function initialAddClassificationDataToMap(){
 async function intermediateClassificationDataToMap(file) {
   return new Promise(function (resolve, reject) {
     const newPredictions = imageClassification('./public/uploads/' + file);    
-    newPredictions.then( () => {
-      classficationToImagesMap.set(file, newPredictions);   
-      console.log(classficationToImagesMap);  
+    newPredictions.then( function(result) {
+      classficationToImagesMap.set(file, result);   
+      // console.log(classficationToImagesMap);  
       resolve(file);
     })
     // when you do a log here it doesnt wait for the result of newPredictions so it will redturn a pending Promise
@@ -176,7 +191,7 @@ async function intermediateClassificationDataToMap(file) {
     if (classficationToImagesMap.has(file)){
       classficationToImagesMap.delete(file);
     }
-    console.log(classficationToImagesMap);
+    // console.log(classficationToImagesMap);
   }
 
 // imageClassification('./public/uploads/admin-dolphin.png');
