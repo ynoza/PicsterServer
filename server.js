@@ -201,7 +201,8 @@ async function intermediateClassificationDataToMap(file) {
 // removeClassificationDataToMap('./public/uploads/admin-cat.png')
 
 // start server
-const port = process.env.NODE_ENV === 'production' ? (process.env.PORT || 80) : 4000;
+const port = process.env.PORT; 
+// process.env.NODE_ENV === 'production' ? (process.env.PORT || 80) : 4000;
 const useless = initialAddClassificationDataToMap();
 useless.then( () => {
   app.listen(port, async () => {
