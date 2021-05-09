@@ -201,11 +201,11 @@ async function intermediateClassificationDataToMap(file) {
 // removeClassificationDataToMap('./public/uploads/admin-cat.png')
 
 // start server
-const port = process.env.PORT; 
 // process.env.NODE_ENV === 'production' ? (process.env.PORT || 80) : 4000;
 const useless = initialAddClassificationDataToMap();
 useless.then( () => {
-  app.listen(port, async () => {
-    console.log('Server listening on port ' + port)
-  })
+  const PORT = process.env.PORT || 4000;
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}.`);
+  });
 });
