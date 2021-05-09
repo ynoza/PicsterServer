@@ -2,13 +2,13 @@ const config = require('config.json');
 const mysql = require('mysql2/promise');
 const { Sequelize } = require('sequelize');
 
-// module.exports = db = {};
-module.exports = db =  {
-    HOST: "us-cdbr-east-03.cleardb.com",
-    USER: "b1f6bd6150b66f",
-    PASSWORD: "55daa557",
-    DB: "heroku_931ecfbffb230c4"
-  };
+module.exports = db = {};
+// module.exports = db =  {
+//     HOST: "us-cdbr-east-03.cleardb.com",
+//     USER: "b1f6bd6150b66f",
+//     PASSWORD: "55daa557",
+//     DB: "heroku_931ecfbffb230c4"
+//   };
 
 initialize();
 
