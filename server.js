@@ -1,7 +1,7 @@
 ﻿require('rootpath')();
 const express = require('express');
 const app = express();
-// const cors = require('cors');
+const cors = require('cors');
 const bodyParser = require('body-parser');
 const errorHandler = require('_middleware/error-handler');
 const multer = require('multer');
@@ -13,7 +13,7 @@ const mobilenet = require('@tensorflow-models/mobilenet');
 const tfnode = require('@tensorflow/tfjs-node');
 
 let localServerLink='https://localhost:4000/public/uploads/';
-let herokuServerLink='https://mighty-falls-84757.herokuapp.com/https://picsterserver.herokuapp.com/public/uploads/';
+let herokuServerLink='https://picsterserver.herokuapp.com/public/uploads/';
 
 const serverInUse=herokuServerLink;
 
@@ -21,7 +21,7 @@ let classficationToImagesMap = new Map()
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-// app.use(cors());
+app.use(cors());
 
 // api routes
 app.use('/users', require('./users/users.controller'));
