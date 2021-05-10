@@ -8,18 +8,18 @@ initialize();
 
 async function initialize() {
     // create db if it doesn't already exist
-    const { host, user, password, database } = config.database;
-    const connection = await mysql.createPool({ host, user, password });
-    console.log("did sql connection")
-    // await connection.query(`CREATE DATABASE IF NOT EXISTS \`${database}\`;`);
+    await sequelize.drop()
+    
+    const { host, port, user, password, database } = config.database;
+    const connection = await mysql.createConnection({ host, port, user, password });
+    await connection.query(`CREATE DATABASE IF NOT EXISTS \`${database}\`;`);
 
     // connect to db
-    module.exports = db.User = connection;
-    // const sequelize = new Sequelize(database, user, password, { dialect: 'mysql' });
+    const sequelize = new Sequelize(database, user, password, { dialect: 'mysql' });
 
     // init models and add them to the exported db object
-    // db.User = require('../users/user.model')(sequelize);
-    // console.log(host, user,password,database);
-    // // sync all models with database
-    // await sequelize.sync();
+    db.User = require('../users/user.model')(sequelize);
+    console.log(host,port,user,password,database);
+    // sync all models with database
+    await sequelize.sync();
 }
