@@ -13,7 +13,7 @@ const mobilenet = require('@tensorflow-models/mobilenet');
 const tfnode = require('@tensorflow/tfjs-node');
 
 let localServerLink='https://localhost:4000/public/uploads/';
-let herokuServerLink='https://picsterserver.herokuapp.com/public/uploads/';
+let herokuServerLink='https://mighty-falls-84757.herokuapp.com/https://picsterserver.herokuapp.com/public/uploads/';
 
 const serverInUse=herokuServerLink;
 
