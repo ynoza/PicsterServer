@@ -11,6 +11,9 @@ const fs = require('fs');
 const tf = require('@tensorflow/tfjs');
 const mobilenet = require('@tensorflow-models/mobilenet');
 const tfnode = require('@tensorflow/tfjs-node');
+var cors = require('cors')
+
+app.use(cors())
 
 let localServerLink='https://localhost:4000/public/uploads/';
 let herokuServerLink='https://picsterserver.herokuapp.com/public/uploads/';
