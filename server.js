@@ -12,7 +12,7 @@ const tf = require('@tensorflow/tfjs');
 const mobilenet = require('@tensorflow-models/mobilenet');
 const tfnode = require('@tensorflow/tfjs-node');
 
-let localServerLink='https://localhost:4000/public/uploads/';
+let localServerLink='http://localhost:4000/public/uploads/';
 let herokuServerLink='https://picsterserver.herokuapp.com/public/uploads/';
 
 const serverInUse=herokuServerLink;
