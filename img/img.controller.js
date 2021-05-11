@@ -90,8 +90,8 @@ router.get('/imagesAndMapPair', function(req, res){
         //   if (classficationToImagesMap.has(file)){
             var url = encodeURI(serverInUse+file);
             // let imageDesc = classficationToImagesMap.get(file);
-            let imageDesc = [file.originalname];
-            console.log(file)
+            let imageDesc = [file];
+            // console.log(file)
             const obj = { imageURL: url, desc: imageDesc}
             lst.push(obj);
         //   }
