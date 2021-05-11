@@ -91,7 +91,7 @@ router.get('/imagesAndMapPair', function(req, res){
             var url = encodeURI(serverInUse+file);
             // let imageDesc = classficationToImagesMap.get(file);
             let imageDesc = [file.originalname];
-            console.log(imageDesc)
+            console.log(file)
             const obj = { imageURL: url, desc: imageDesc}
             lst.push(obj);
         //   }
