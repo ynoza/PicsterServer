@@ -142,17 +142,15 @@ const getClassNames =  (predictions) => {
 }
 
 
-async function initialAddClassificationDataToMap(){
-  return new Promise(function (resolve, reject) {
+function initialAddClassificationDataToMap(){
     const folder = './public/uploads/';
     fs.readdir(folder, (err, files) => {
       files.forEach(async file => {
-        var useless = await intermediateClassificationDataToMap(file);
+        intermediateClassificationDataToMap(file);
       })
       resolve(folder);
     })
-    console.log(classficationToImagesMap); 
-  })
+    console.log(classficationToImagesMap);
 }
 
 async function intermediateClassificationDataToMap(file) {
