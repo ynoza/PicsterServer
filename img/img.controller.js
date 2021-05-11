@@ -148,7 +148,6 @@ function initialAddClassificationDataToMap(){
       files.forEach(async file => {
         intermediateClassificationDataToMap(file);
       })
-      resolve(folder);
     })
     console.log(classficationToImagesMap);
 }
