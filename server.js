@@ -5,10 +5,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const errorHandler = require('_middleware/error-handler');
 const multer = require('multer');
-const path = require('path');
-const ejs = require('ejs');
 const fs = require('fs');
-const tf = require('@tensorflow/tfjs');
 const mobilenet = require('@tensorflow-models/mobilenet');
 const tfnode = require('@tensorflow/tfjs-node');
 
